@@ -1,14 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="report_purchaseorder_document_inherit_delivery_address" inherit_id="purchase.report_purchaseorder_document">
-        <xpath expr="//div[@id='informations']" position="before">
-            <div class="row" dir="ltr" t-if="o.delivery_address_id">
-                <div class="col-6">
-                    <strong>Teslimat Adresi:</strong>
-                    <div t-field="o.delivery_address_id"
-                        t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'/>
-                </div>
-            </div>
+        
+        <!-- Replace the standard dest_address_id check with our logic -->
+        <xpath expr="//t[@t-if='o.dest_address_id']" position="replace">
+            <t t-if="o.delivery_address_id or o.dest_address_id">
+                <t t-set="information_block">
+                    <!-- 1. Custom Delivery Address -->
+                    <t t-if="o.delivery_address_id">
+                        <strong>Teslimat Adresi:</strong>
+                        <div t-field="o.delivery_address_id" 
+                             t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'/>
+                    </t>
+                    <!-- 2. Standard Shipping Address Fallback -->
+                    <t t-elif="o.dest_address_id">
+                         <strong>Shipping address:</strong>
+                         <div t-field="o.dest_address_id" 
+                              t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}' 
+                              name="purchase_shipping_address"/>
+                    </t>
+                </t>
+            </t>
         </xpath>
+
     </template>
 </odoo>
